@@ -21,6 +21,9 @@ import c4gnv.com.thingsregistry.net.model.EventPostResponse;
 
 public class MainActivity extends AppCompatActivity {
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
     @BindView(R.id.fab)
     FloatingActionButton fab;
 
@@ -29,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        toolbar.setTitle(R.string.main_activity_title);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 */
+                startActivity(AddThingActivity.newIntent(MainActivity.this));
             }
         });
     }
