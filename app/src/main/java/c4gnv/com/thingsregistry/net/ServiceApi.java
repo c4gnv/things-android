@@ -12,6 +12,7 @@ import retrofit2.http.Field;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 import retrofit2.http.Url;
 
 public interface ServiceApi {
@@ -21,8 +22,8 @@ public interface ServiceApi {
     @GET("/types")
     Call<List<ThingType>> getTypes();
 
-    @GET("/things?typeId=typeId")
-    Call<List<Thing>> getThingsByType(@Field("typeId") String typeId);
+    @GET("/things")
+    Call<List<Thing>> getThingsByType(@Query("typeId") String typeId);
 
     @POST()
     Call<EventPostResponse> postEvent(@Url String url, @Header("Authorization") String authorizationToken, @Body EventPostRequest eventPostRequest);

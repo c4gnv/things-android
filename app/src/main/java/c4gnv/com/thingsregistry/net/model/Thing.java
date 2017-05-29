@@ -71,4 +71,9 @@ public class Thing {
     public void setPieceId(List<Integer> pieceId) {
         this.pieceId = pieceId;
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

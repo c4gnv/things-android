@@ -3,4 +3,8 @@
     <string name="main_activity_title">Things</string>
     <string name="add_thing_activity_title">Add a Thing</string>
     <string name="thing_detail_activity_title">Thing Detail</string>
+    <string name="api_error">I\'m sorry, there was a problem.</string>
+    <string name="add_thing_type_label">Thing Type:</string>
+    <string name="add_thing_label">Thing:</string>
+    <string name="add_thing_create_label">Create Thing</string>
 </resources>
