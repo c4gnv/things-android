@@ -1,6 +1,10 @@
 package c4gnv.com.thingsregistry.net.model;
 
-public class ThingType {
+import java.io.Serializable;
+
+public class ThingType implements Serializable {
+
+    private static final long serialVersionUID = 1;
 
     private String id;
     private String name;

@@ -1,13 +1,11 @@
 package c4gnv.com.thingsregistry.net.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import c4gnv.com.thingsregistry.util.StringUtil;
 
-public class Thing implements Serializable {
+public class Piece implements Serializable {
 
     private static final long serialVersionUID = 1;
 
@@ -16,11 +14,14 @@ public class Thing implements Serializable {
     private String name;
     private String description;
     private String icon;
-    private String typeId;
-    private List<Integer> pieceId;
-    private List<Piece> pieces;
+    private String url;
+    private String token;
+    private EventPostRequest normalEvent;
+    private EventPostRequest diagnosticEvent;
+    private EventPostRequest warningEvent;
+    private EventPostRequest faultEvent;
 
-    public Thing() {
+    public Piece() {
         // No-op
     }
 
@@ -64,41 +65,52 @@ public class Thing implements Serializable {
         this.icon = icon;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public String getUrl() {
+        return url;
     }
 
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
-    public List<Integer> getPieceId() {
-        return pieceId;
+    public String getToken() {
+        return token;
     }
 
-    public void setPieceId(List<Integer> pieceId) {
-        this.pieceId = pieceId;
+    public void setToken(String token) {
+        this.token = token;
     }
 
-    @Override
-    public String toString() {
-        return this.name;
+    public EventPostRequest getNormalEvent() {
+        return normalEvent;
     }
 
-    public List<Piece> getPieces() {
-        return pieces;
+    public void setNormalEvent(EventPostRequest normalEvent) {
+        this.normalEvent = normalEvent;
     }
 
-    public void setPieces(List<Piece> pieces) {
-        this.pieces = pieces;
+    public EventPostRequest getDiagnosticEvent() {
+        return diagnosticEvent;
     }
 
-    public void addPiece(Piece piece) {
-        if (this.pieces == null) {
-            this.pieces = new ArrayList<>();
-        }
+    public void setDiagnosticEvent(EventPostRequest diagnosticEvent) {
+        this.diagnosticEvent = diagnosticEvent;
+    }
 
-        this.pieces.add(piece);
+    public EventPostRequest getWarningEvent() {
+        return warningEvent;
+    }
+
+    public void setWarningEvent(EventPostRequest warningEvent) {
+        this.warningEvent = warningEvent;
+    }
+
+    public EventPostRequest getFaultEvent() {
+        return faultEvent;
+    }
+
+    public void setFaultEvent(EventPostRequest faultEvent) {
+        this.faultEvent = faultEvent;
     }
 
     public void generateSerial() {

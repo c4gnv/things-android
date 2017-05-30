@@ -16,12 +16,15 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import c4gnv.com.thingsregistry.App;
 import c4gnv.com.thingsregistry.R;
 import c4gnv.com.thingsregistry.net.ServiceCallback;
 import c4gnv.com.thingsregistry.net.ServiceError;
+import c4gnv.com.thingsregistry.net.model.Piece;
 import c4gnv.com.thingsregistry.net.model.Thing;
 import c4gnv.com.thingsregistry.net.model.ThingType;
+import c4gnv.com.thingsregistry.util.PrefsUtil;
 
 public class AddThingActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -38,6 +41,9 @@ public class AddThingActivity extends AppCompatActivity implements AdapterView.O
     private List<Thing> things;
     private ThingType selectedThingType;
     private Thing selectedThing;
+    private boolean isLoading;
+    private int pieceCount = 0;
+    private int piecesProcessed = 0;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, AddThingActivity.class);
@@ -57,6 +63,7 @@ public class AddThingActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void loadThingTypes() {
+        isLoading = true;
         App.get().getServiceApi().getTypes().enqueue(new ServiceCallback<List<ThingType>>() {
             @Override
             public void onSuccess(List<ThingType> response) {
@@ -65,16 +72,21 @@ public class AddThingActivity extends AppCompatActivity implements AdapterView.O
                 thingTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 typeSpinner.setAdapter(thingTypeAdapter);
                 typeSpinner.setOnItemSelectedListener(AddThingActivity.this);
+                isLoading = false;
+                updateUI();
             }
 
             @Override
             public void onFail(ServiceError error) {
-                Toast.makeText(AddThingActivity.this, R.string.api_error, Toast.LENGTH_LONG).show();
+                apiError();
+                isLoading = false;
+                updateUI();
             }
         });
     }
 
     private void loadThings(String thingType) {
+        isLoading = true;
         App.get().getServiceApi().getThingsByType(thingType).enqueue(new ServiceCallback<List<Thing>>() {
             @Override
             public void onSuccess(List<Thing> response) {
@@ -83,11 +95,15 @@ public class AddThingActivity extends AppCompatActivity implements AdapterView.O
                 thingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 thingSpinner.setAdapter(thingAdapter);
                 thingSpinner.setOnItemSelectedListener(AddThingActivity.this);
+                isLoading = false;
+                updateUI();
             }
 
             @Override
             public void onFail(ServiceError error) {
-                Toast.makeText(AddThingActivity.this, R.string.api_error, Toast.LENGTH_LONG).show();
+                apiError();
+                isLoading = false;
+                updateUI();
             }
         });
     }
@@ -115,10 +131,45 @@ public class AddThingActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void updateUI() {
-        if (selectedThingType != null && selectedThing != null) {
+        if (selectedThingType != null && selectedThing != null && !isLoading) {
             createThingButton.setEnabled(true);
         } else {
             createThingButton.setEnabled(false);
         }
+    }
+
+    @OnClick(R.id.create_thing_button)
+    public void onClickCreateThing(View view) {
+        if (view.isEnabled() && selectedThing != null) {
+            selectedThing.generateSerial();
+            pieceCount = selectedThing.getPieceId().size();
+            for (Integer pieceId : selectedThing.getPieceId()) {
+                App.get().getServiceApi().getPieceById(String.valueOf(pieceId)).enqueue(new ServiceCallback<Piece>() {
+                    @Override
+                    public void onSuccess(Piece response) {
+                        response.generateSerial();
+                        selectedThing.addPiece(response);
+                        piecesProcessed++;
+                        finishIfComplete();
+                    }
+
+                    @Override
+                    public void onFail(ServiceError error) {
+                        apiError();
+                    }
+                });
+            }
+        }
+    }
+
+    private void finishIfComplete() {
+        if (piecesProcessed == pieceCount) {
+            PrefsUtil.addThing(this, selectedThing);
+            finish();
+        }
+    }
+
+    private void apiError() {
+        Toast.makeText(AddThingActivity.this, R.string.api_error, Toast.LENGTH_LONG).show();
     }
 }

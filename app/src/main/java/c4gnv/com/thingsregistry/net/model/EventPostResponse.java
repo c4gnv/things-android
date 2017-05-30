@@ -1,6 +1,10 @@
 package c4gnv.com.thingsregistry.net.model;
 
-public class EventPostResponse {
+import java.io.Serializable;
+
+public class EventPostResponse implements Serializable {
+
+    private static final long serialVersionUID = 1;
 
     private String count;
 

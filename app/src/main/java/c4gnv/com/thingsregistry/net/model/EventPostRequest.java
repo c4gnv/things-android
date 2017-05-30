@@ -1,6 +1,10 @@
 package c4gnv.com.thingsregistry.net.model;
 
-public class EventPostRequest {
+import java.io.Serializable;
+
+public class EventPostRequest implements Serializable {
+
+    private static final long serialVersionUID = 1;
 
     private String serialNumber;
     private String batteryVoltage;
