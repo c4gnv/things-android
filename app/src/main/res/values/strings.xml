@@ -1,10 +1,23 @@
 <resources>
     <string name="app_name">Things</string>
+
+    <!-- MAIN ACTIVITY -->
     <string name="main_activity_title">Things</string>
+
+    <!-- ADD THING -->
     <string name="add_thing_activity_title">Add a Thing</string>
-    <string name="thing_detail_activity_title">Thing Detail</string>
-    <string name="api_error">I\'m sorry, there was a problem.</string>
     <string name="add_thing_type_label">Thing Type:</string>
     <string name="add_thing_label">Thing:</string>
     <string name="add_thing_create_label">Create Thing</string>
+
+    <!-- THING DETAIL -->
+    <string name="thing_detail_activity_title">Thing Detail</string>
+    <string name="thing_detail_serial">Serial Number:</string>
+    <string name="thing_detail_description">Description: %s</string>
+    <string name="thing_detail_send_button">Send Events</string>
+
+    <!-- ERRORS -->
+    <string name="api_error">I\'m sorry, there was a problem.</string>
+
+
 </resources>
