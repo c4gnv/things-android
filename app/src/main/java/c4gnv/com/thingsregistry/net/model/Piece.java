@@ -9,6 +9,13 @@ public class Piece implements Serializable {
 
     private static final long serialVersionUID = 1;
 
+    public enum PieceState {
+        NORMAL,
+        DIAGNOSTIC,
+        WARNING,
+        FAULT
+    }
+
     private String id;
     private String serialNumber;
     private String name;
@@ -20,6 +27,7 @@ public class Piece implements Serializable {
     private EventPostRequest diagnosticEvent;
     private EventPostRequest warningEvent;
     private EventPostRequest faultEvent;
+    private PieceState state;
 
     public Piece() {
         // No-op
@@ -117,5 +125,13 @@ public class Piece implements Serializable {
         if (StringUtil.isEmpty(serialNumber)) {
             this.serialNumber = UUID.randomUUID().toString();
         }
+    }
+
+    public PieceState getState() {
+        return state;
+    }
+
+    public void setState(PieceState state) {
+        this.state = state;
     }
 }

@@ -14,7 +14,16 @@
     <string name="thing_detail_activity_title">Thing Detail</string>
     <string name="thing_detail_serial">Serial Number:</string>
     <string name="thing_detail_description">Description: %s</string>
+    <string name="thing_detail_select_state">Select a State:</string>
     <string name="thing_detail_send_button">Send Events</string>
+
+    <array
+        name="state_array">
+        <item>Normal</item>
+        <item>Diagnostic</item>
+        <item>Warning</item>
+        <item>Fault</item>
+    </array>
 
     <!-- ERRORS -->
     <string name="api_error">I\'m sorry, there was a problem.</string>

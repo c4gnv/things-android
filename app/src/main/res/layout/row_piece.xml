@@ -8,8 +8,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/piece_name"
@@ -19,19 +19,24 @@
             android:textColor="@color/colorPrimaryDark"
             android:textSize="18sp"
             android:textStyle="bold"
-            tools:text="Thing name" />
+            tools:text="Thing name (abc12)" />
 
         <TextView
-            android:id="@+id/piece_serial"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="ABC123DEF456" />
+            android:text="@string/thing_detail_select_state"
+            android:layout_marginBottom="8dp"/>
+
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/piece_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorGray"/>
+        android:background="@color/colorGray" />
 
 </LinearLayout>

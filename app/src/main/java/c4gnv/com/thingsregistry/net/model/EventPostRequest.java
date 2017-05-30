@@ -9,6 +9,7 @@ public class EventPostRequest implements Serializable {
     private String serialNumber;
     private String batteryVoltage;
     private String clickType;
+    private int rssiDb;
 
     public EventPostRequest() {
         // No-op
@@ -36,5 +37,13 @@ public class EventPostRequest implements Serializable {
 
     public void setClickType(String clickType) {
         this.clickType = clickType;
+    }
+
+    public int getRssiDb() {
+        return rssiDb;
+    }
+
+    public void setRssiDb(int rssiDb) {
+        this.rssiDb = rssiDb;
     }
 }

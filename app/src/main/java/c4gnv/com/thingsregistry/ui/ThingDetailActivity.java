@@ -5,10 +5,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,9 +24,16 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import c4gnv.com.thingsregistry.App;
 import c4gnv.com.thingsregistry.R;
+import c4gnv.com.thingsregistry.net.ServiceCallback;
+import c4gnv.com.thingsregistry.net.ServiceError;
+import c4gnv.com.thingsregistry.net.model.EventPostRequest;
+import c4gnv.com.thingsregistry.net.model.EventPostResponse;
 import c4gnv.com.thingsregistry.net.model.Piece;
 import c4gnv.com.thingsregistry.net.model.Thing;
+import c4gnv.com.thingsregistry.net.model.ThingType;
+import c4gnv.com.thingsregistry.util.StringUtil;
 
 public class ThingDetailActivity extends AppCompatActivity {
 
@@ -32,6 +46,9 @@ public class ThingDetailActivity extends AppCompatActivity {
     RecyclerView thingDetailPieceList;
 
     private Thing thing;
+    private ListAdapter adapter;
+    private int pieceCount = 0;
+    private int piecesCompleted = 0;
 
     public static Intent newIntent(Context context, Thing thing) {
         Intent thingDetailIntent = new Intent(context, ThingDetailActivity.class);
@@ -51,12 +68,8 @@ public class ThingDetailActivity extends AppCompatActivity {
         setTitle(thing.getName() + " (" + thing.getSerialNumber().substring(0, 5) + ")");
         thingDetailDescription.setText(getString(R.string.thing_detail_description, thing.getDescription()));
         thingDetailPieceList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        thingDetailPieceList.setAdapter(new ListAdapter(thing.getPieces()));
-    }
-
-    @OnClick(R.id.thing_detail_send_button)
-    public void onClickSendEvents() {
-        Toast.makeText(this, "Clicked Send Events", Toast.LENGTH_LONG).show();
+        adapter = new ListAdapter(thing.getPieces());
+        thingDetailPieceList.setAdapter(adapter);
     }
 
     private class ListAdapter extends RecyclerView.Adapter<PieceHolder> {
@@ -81,15 +94,19 @@ public class ThingDetailActivity extends AppCompatActivity {
         public int getItemCount() {
             return this.pieces.size();
         }
+
+        public List<Piece> getPieces() {
+            return pieces;
+        }
     }
 
-    public class PieceHolder extends RecyclerView.ViewHolder {
+    public class PieceHolder extends RecyclerView.ViewHolder implements AdapterView.OnItemSelectedListener {
 
         @BindView(R.id.piece_name)
         TextView pieceName;
 
-        @BindView(R.id.piece_serial)
-        TextView pieceSerial;
+        @BindView(R.id.piece_spinner)
+        AppCompatSpinner pieceSpinner;
 
         private Piece piece;
 
@@ -100,35 +117,64 @@ public class ThingDetailActivity extends AppCompatActivity {
 
         void bind(Piece piece) {
             this.piece = piece;
-            this.pieceName.setText(piece.getName());
-            this.pieceSerial.setText(piece.getSerialNumber());
+            this.pieceName.setText(piece.getName() + " (" + piece.getSerialNumber().substring(0, 5) + ")");
+            ArrayAdapter<CharSequence> stateAdapter = ArrayAdapter.createFromResource(ThingDetailActivity.this, R.array.state_array, android.R.layout.simple_spinner_item);
+            stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            pieceSpinner.setOnItemSelectedListener(this);
+            pieceSpinner.setAdapter(stateAdapter);
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            piece.setState(Piece.PieceState.values()[i]);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+            // No-op
         }
     }
 
-    /*
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                        */
+    @OnClick(R.id.thing_detail_send_button)
+    public void onClickSendEvents(View view) {
+        List<Piece> pieces = adapter.getPieces();
+        pieceCount = pieces.size();
 
-                /*
-                String url = "https://ingestion-7aaxydpjj81u.us3.sfdcnow.com/streams/davestantoninputs001/davestantoninputs001/event";
-                String authorizationToken = "Bearer " + "EvvuS9dp4VrzpV9X1Z5yw7OOyWYrSDKOjFQ6hoBB67pdXQt212b21LFwLYD1lMPnh3qgZS0gzhwkh3JNHmlxBG";
+        for (final Piece piece : adapter.getPieces()) {
+            String url = piece.getUrl();
+            String authToken = "Bearer " + piece.getToken();
+            EventPostRequest request;
 
-                EventPostRequest eventPostRequest = new EventPostRequest();
-                eventPostRequest.setSerialNumber("G030JF055216JC4M");
-                eventPostRequest.setBatteryVoltage("1708mV");
-                eventPostRequest.setClickType("SINGLE");
+            Piece.PieceState state = piece.getState();
+            switch (state) {
+                case DIAGNOSTIC:
+                    request = piece.getDiagnosticEvent();
+                    break;
+                case WARNING:
+                    request = piece.getWarningEvent();
+                    break;
+                case FAULT:
+                    request = piece.getFaultEvent();
+                    break;
+                case NORMAL:
+                default:
+                    request = piece.getNormalEvent();
+                    break;
+            }
 
-                App.get().getServiceApi().postEvent(url, authorizationToken, eventPostRequest).enqueue(new ServiceCallback<EventPostResponse>() {
-                    @Override
-                    public void onSuccess(EventPostResponse response) {
-                        Toast.makeText(MainActivity.this, "Count: " + response.getCount(), Toast.LENGTH_LONG).show();
-                    }
+            request.setSerialNumber(piece.getSerialNumber());
 
-                    @Override
-                    public void onFail(ServiceError error) {
-                        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
-                */
+            App.get().getServiceApi().postEvent(url, authToken, request).enqueue(new ServiceCallback<EventPostResponse>() {
+                @Override
+                public void onSuccess(EventPostResponse response) {
+                    Toast.makeText(ThingDetailActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFail(ServiceError error) {
+                    Toast.makeText(ThingDetailActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 }
