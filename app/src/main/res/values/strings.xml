@@ -3,6 +3,7 @@
 
     <!-- MAIN ACTIVITY -->
     <string name="main_activity_title">Things</string>
+    <string name="delete_all_things">Delete All</string>
 
     <!-- ADD THING -->
     <string name="add_thing_activity_title">Add a Thing</string>

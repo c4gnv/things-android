@@ -21,7 +21,7 @@ public class PrefsUtil {
         List<Thing> things = getThings(context);
         things.add(thing);
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPrefs(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(things);
@@ -30,10 +30,26 @@ public class PrefsUtil {
     }
 
     public static List<Thing> getThings(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(KEY_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPrefs(context);
         String json = sharedPreferences.getString(KEY_SAVED_THINGS, "[]");
         Gson gson = new Gson();
         Type thingListType = new TypeToken<ArrayList<Thing>>(){}.getType();
-        return gson.fromJson(json, thingListType);
+        List<Thing> things = gson.fromJson(json, thingListType);
+        if (things != null) {
+            return things;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    public static void deleteAllThings(Context context) {
+        SharedPreferences sharedPreferences = getSharedPrefs(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_SAVED_THINGS, "");
+        editor.commit();
+    }
+
+    private static SharedPreferences getSharedPrefs(Context context) {
+        return context.getSharedPreferences(KEY_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     }
 }

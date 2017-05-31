@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         toolbar.setTitle(R.string.main_activity_title);
+        setSupportActionBar(toolbar);
 
         thingListRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
@@ -124,5 +125,20 @@ public class MainActivity extends AppCompatActivity {
         public void onClickRow() {
             startActivity(ThingDetailActivity.newIntent(MainActivity.this, this.thing));
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.delete_all_things) {
+            PrefsUtil.deleteAllThings(this);
+            updateUI();
+        }
+        return true;
     }
 }
