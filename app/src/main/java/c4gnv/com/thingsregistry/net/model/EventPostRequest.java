@@ -7,9 +7,9 @@ public class EventPostRequest implements Serializable {
     private static final long serialVersionUID = 1;
 
     private String serialNumber;
-    private String batteryVoltage;
     private String clickType;
     private int rssiDb;
+    private int batteryVoltage;
 
     public EventPostRequest() {
         // No-op
@@ -23,11 +23,11 @@ public class EventPostRequest implements Serializable {
         this.serialNumber = serialNumber;
     }
 
-    public String getBatteryVoltage() {
+    public int getBatteryVoltage() {
         return batteryVoltage;
     }
 
-    public void setBatteryVoltage(String batteryVoltage) {
+    public void setBatteryVoltage(int batteryVoltage) {
         this.batteryVoltage = batteryVoltage;
     }
 

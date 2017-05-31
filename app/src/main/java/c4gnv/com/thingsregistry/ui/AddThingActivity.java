@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -144,6 +145,7 @@ public class AddThingActivity extends AppCompatActivity implements AdapterView.O
             selectedThing.generateSerial();
             pieceCount = selectedThing.getPieceId().size();
             for (Integer pieceId : selectedThing.getPieceId()) {
+                Log.d("TAG", ""+ pieceId);
                 App.get().getServiceApi().getPieceById(String.valueOf(pieceId)).enqueue(new ServiceCallback<Piece>() {
                     @Override
                     public void onSuccess(Piece response) {
@@ -156,6 +158,7 @@ public class AddThingActivity extends AppCompatActivity implements AdapterView.O
                     @Override
                     public void onFail(ServiceError error) {
                         apiError();
+                        finish();
                     }
                 });
             }

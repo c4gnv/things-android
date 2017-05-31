@@ -163,16 +163,17 @@ public class ThingDetailActivity extends AppCompatActivity {
             }
 
             request.setSerialNumber(piece.getSerialNumber());
+            final String serialNumber = piece.getSerialNumber().substring(0, 5);
 
             App.get().getServiceApi().postEvent(url, authToken, request).enqueue(new ServiceCallback<EventPostResponse>() {
                 @Override
                 public void onSuccess(EventPostResponse response) {
-                    Toast.makeText(ThingDetailActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ThingDetailActivity.this, "Success (" + serialNumber + ")", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onFail(ServiceError error) {
-                    Toast.makeText(ThingDetailActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ThingDetailActivity.this, "Failure (" + serialNumber + ")", Toast.LENGTH_SHORT).show();
                 }
             });
         }
