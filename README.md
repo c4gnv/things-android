@@ -18,4 +18,4 @@ An Android app to create virtual things for example IoT projects.
 
 ## Supporting new pieces and things
 
-All possible JSON attributes for your Thing events must be ![defined in code](https://github.com/c4gnv/things-android/blob/develop/app/src/main/java/c4gnv/com/thingsregistry/net/model/EventPostRequest.kt) before you build the app.
+All possible JSON attributes for your Thing events must be [defined in code](https://github.com/c4gnv/things-android/blob/develop/app/src/main/java/c4gnv/com/thingsregistry/net/model/EventPostRequest.kt) before you build the app.
