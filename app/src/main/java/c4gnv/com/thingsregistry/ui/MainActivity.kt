@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         val thingName: TextView by bindView(R.id.thing_name)
         val thingSerial: TextView by bindView(R.id.thing_serial)
         val rowLayout: LinearLayout by bindView(R.id.row_layout)
-        private var thing: Thing? = null
+        private var thing: Thing = Thing()
 
         internal fun bind(thing: Thing) {
             this.thing = thing
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             this.thingSerial.text = thing.serialNumber
 
             rowLayout.setOnClickListener({
-                startActivity(ThingDetailActivity.newIntent(this@MainActivity, this.thing!!))
+                startActivity(ThingDetailActivity.newIntent(this@MainActivity, this.thing))
             })
         }
     }

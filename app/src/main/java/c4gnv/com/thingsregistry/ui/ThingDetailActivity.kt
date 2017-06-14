@@ -28,8 +28,8 @@ class ThingDetailActivity : AppCompatActivity() {
     val thingDetailPieceList: RecyclerView by bindView(R.id.thing_detail_piece_list)
     val thingDetailSendButton: Button by bindView(R.id.thing_detail_send_button)
 
-    private var thing: Thing? = null
-    private var adapter: ListAdapter? = null
+    private var thing: Thing = Thing()
+    private var adapter: ListAdapter = ListAdapter()
     private var pieceCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,32 +39,32 @@ class ThingDetailActivity : AppCompatActivity() {
         setTitle(R.string.thing_detail_activity_title)
 
         this.thing = intent.extras.getSerializable(KEY_THING) as Thing
-        title = thing!!.name + " (" + thing!!.serialNumber!!.substring(0, 5) + ")"
-        thingDetailDescription.text = getString(R.string.thing_detail_description, thing!!.description)
+        title = thing.name + " (" + thing.serialNumber.substring(0, 5) + ")"
+        thingDetailDescription.text = getString(R.string.thing_detail_description, thing.description)
         thingDetailPieceList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        adapter = ListAdapter(thing!!.getPieces())
+        adapter = ListAdapter(thing.pieces)
         thingDetailPieceList.adapter = adapter
 
         thingDetailSendButton.setOnClickListener({
-            val pieces = adapter!!.pieces
+            val pieces = adapter.pieces
             pieceCount = pieces.size
 
-            for (piece in adapter!!.pieces) {
-                val url = piece.url!!
+            for (piece in adapter.pieces) {
+                val url = piece.url
                 val authToken = "Bearer " + piece.token
                 val request: EventPostRequest
 
                 val state = piece.state
                 when (state) {
-                    Piece.PieceState.DIAGNOSTIC -> request = piece.diagnosticEvent!!
-                    Piece.PieceState.WARNING -> request = piece.warningEvent!!
-                    Piece.PieceState.FAULT -> request = piece.faultEvent!!
-                    Piece.PieceState.NORMAL -> request = piece.normalEvent!!
-                    else -> request = piece.normalEvent!!
+                    Piece.PieceState.DIAGNOSTIC -> request = piece.diagnosticEvent
+                    Piece.PieceState.WARNING -> request = piece.warningEvent
+                    Piece.PieceState.FAULT -> request = piece.faultEvent
+                    Piece.PieceState.NORMAL -> request = piece.normalEvent
+                    else -> request = piece.normalEvent
                 }
 
                 request.serialNumber = piece.serialNumber
-                val serialNumber = piece.serialNumber!!.substring(0, 5)
+                val serialNumber = piece.serialNumber.substring(0, 5)
 
                 App.get().getServiceApi().postEvent(url, authToken, request).enqueue(object : ServiceCallback<EventPostResponse>() {
                     override fun onSuccess(response: EventPostResponse) {
@@ -79,7 +79,7 @@ class ThingDetailActivity : AppCompatActivity() {
         })
     }
 
-    private inner class ListAdapter constructor(val pieces: List<Piece>) : RecyclerView.Adapter<PieceHolder>() {
+    private inner class ListAdapter constructor(val pieces: List<Piece> = ArrayList<Piece>()) : RecyclerView.Adapter<PieceHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PieceHolder {
             return PieceHolder(parent)
@@ -99,12 +99,12 @@ class ThingDetailActivity : AppCompatActivity() {
         val pieceName: TextView by bindView(R.id.piece_name)
         val pieceSpinner: AppCompatSpinner by bindView(R.id.piece_spinner)
 
-        private var piece: Piece? = null
+        private var piece: Piece = Piece()
 
         internal fun bind(piece: Piece) {
             this.piece = piece
             val name = piece.name
-            val serial = piece.serialNumber!!.substring(0, 5)
+            val serial = piece.serialNumber.substring(0, 5)
             this.pieceName.text = "$name ($serial)"
             val stateAdapter = ArrayAdapter.createFromResource(this@ThingDetailActivity, R.array.state_array, android.R.layout.simple_spinner_item)
             stateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -113,7 +113,7 @@ class ThingDetailActivity : AppCompatActivity() {
         }
 
         override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
-            piece!!.state = Piece.PieceState.values()[i]
+            piece.state = Piece.PieceState.values()[i]
         }
 
         override fun onNothingSelected(adapterView: AdapterView<*>) {
