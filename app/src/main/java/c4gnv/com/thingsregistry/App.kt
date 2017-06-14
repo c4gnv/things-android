@@ -33,7 +33,7 @@ class App : Application() {
 
             serviceApi = retrofit.create(ServiceApi::class.java)
         }
-        return serviceApi!!
+        return serviceApi as ServiceApi
     }
 
     companion object {
@@ -41,7 +41,7 @@ class App : Application() {
         private var instance: App? = null
 
         fun get(): App {
-            return instance!!
+            return instance as App
         }
     }
 }

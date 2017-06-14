@@ -27,10 +27,10 @@ class AddThingActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
     val thingSpinner: AppCompatSpinner by bindView(R.id.thing_spinner)
     val createThingButton: Button by bindView(R.id.create_thing_button)
 
-    private var thingTypes: List<ThingType>? = null
-    private var things: List<Thing>? = null
-    private var selectedThingType: ThingType? = null
-    private var selectedThing: Thing? = null
+    private var thingTypes: List<ThingType> = ArrayList<ThingType>()
+    private var things: List<Thing> = ArrayList<Thing>()
+    private var selectedThingType: ThingType = ThingType()
+    private var selectedThing: Thing = Thing()
     private var isLoading: Boolean = false
     private var pieceCount = 0
     private var piecesProcessed = 0
@@ -42,14 +42,14 @@ class AddThingActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         setTitle(R.string.add_thing_activity_title)
 
         createThingButton.setOnClickListener({
-            if (createThingButton.isEnabled && selectedThing != null) {
-                selectedThing!!.generateSerial()
-                pieceCount = selectedThing!!.pieceId!!.size
-                for (pieceId in selectedThing!!.pieceId!!) {
+            if (createThingButton.isEnabled) {
+                selectedThing.generateSerial()
+                pieceCount = selectedThing.pieceId.size
+                for (pieceId in selectedThing.pieceId) {
                     App.get().getServiceApi().getPieceById(pieceId.toString()).enqueue(object : ServiceCallback<Piece>() {
                         override fun onSuccess(response: Piece) {
                             response.generateSerial()
-                            selectedThing!!.addPiece(response)
+                            selectedThing.addPiece(response)
                             piecesProcessed++
                             finishIfComplete()
                         }
@@ -114,10 +114,10 @@ class AddThingActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
     override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
         when (adapterView.id) {
             R.id.type_spinner -> {
-                this.selectedThingType = thingTypes!![i]
-                loadThings(selectedThingType!!.id!!)
+                this.selectedThingType = thingTypes[i]
+                loadThings(selectedThingType.id)
             }
-            R.id.thing_spinner -> this.selectedThing = things!![i]
+            R.id.thing_spinner -> this.selectedThing = things[i]
             else -> {}
         }
 
@@ -129,12 +129,12 @@ class AddThingActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
     }
 
     private fun updateUI() {
-        createThingButton.isEnabled = selectedThingType != null && selectedThing != null && !isLoading
+        createThingButton.isEnabled = !isLoading
     }
 
     private fun finishIfComplete() {
         if (piecesProcessed == pieceCount) {
-            PrefsUtil.addThing(this, selectedThing!!)
+            PrefsUtil.addThing(this, selectedThing)
             finish()
         }
     }

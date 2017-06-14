@@ -19,8 +19,11 @@ abstract class ServiceCallback<T> : Callback<T> {
             onSuccess(response.body() as T)
         } else {
             try {
-                val errorJson = response.errorBody()!!.string()
-                handleConnectionError(call, statusCode, errorJson)
+                val errorBody = response.errorBody()
+                if (errorBody != null) {
+                    val errorJson = errorBody.string()
+                    handleConnectionError(call, statusCode, errorJson)
+                }
             } catch (e: Exception) {
                 handleException(call, e)
             }
